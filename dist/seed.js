@@ -20,7 +20,7 @@ function main() {
             },
         });
         console.log("User created: ", signUpUser);
-        console.log("API Key: " + signUpUser.apiKey);
+        console.log("API Key: " + "GDGV?=" + signUpUser.id + "123kalamdreamlabs");
         //Create author
         const author = yield prisma.author.create({
             data: {
