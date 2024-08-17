@@ -69,14 +69,12 @@ app.post("/get-all-posts", (req, res) => __awaiter(void 0, void 0, void 0, funct
     const { apiKey } = req.body;
     const response = yield prismaClient_1.default.user.findUnique({
         where: {
-            id: apiKey.replace("GDGV?=", "").replace("123kalamdreamlabs", "")
+            id: apiKey.replace("GDGV?", "").replace("123kalamdreamlabs", "")
         }
     });
     if (response) {
         const posts = yield prismaClient_1.default.post.findMany({
-            include: {
-                Author: true
-            }
+        // {BUG 6} - Fix the bug in the query
         });
         res.json(posts);
     }
@@ -85,8 +83,18 @@ app.post("/get-all-posts", (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 }));
 app.post("/create-post", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { authorId, title, content, image, link } = req.body;
+    const { title, content, image, link } = req.body;
+    const authorId = 'lakshit-malla';
     try {
+        const author = yield prismaClient_1.default.author.findUnique({
+            where: {
+                id: authorId
+            }
+        });
+        if (!author) {
+            // {BUG 7} - Fix the bug in the query
+            return;
+        }
         const post = yield prismaClient_1.default.post.create({
             data: {
                 title: title,

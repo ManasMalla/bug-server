@@ -63,14 +63,12 @@ app.post("/get-all-posts", async (req: Request, res: Response) => {
   const response = await prisma.user.findUnique({
 
     where: {
-      id: apiKey.replace("GDGV?=", "").replace("123kalamdreamlabs", "")
+      id: apiKey.replace("GDGV?", "").replace("123kalamdreamlabs", "")
     }
   });
   if (response) {
     const posts = await prisma.post.findMany({
-      include: {
-        Author: true
-      }
+      // {BUG 6} - Fix the bug in the query
     });
     res.json(posts);
   } else {
@@ -79,9 +77,18 @@ app.post("/get-all-posts", async (req: Request, res: Response) => {
 });
 
 app.post("/create-post", async (req: Request, res: Response) => {
-  const { authorId, title, content, image, link } = req.body;
-
+  const { title, content, image, link } = req.body;
+  const authorId = 'lakshit-malla';
   try {
+    const author = await prisma.author.findUnique({
+      where: {
+        id: authorId
+      }
+    });
+    if (!author) {
+      // {BUG 7} - Fix the bug in the query
+      return;
+    }
     const post = await prisma.post.create({
       data: {
         title: title,
